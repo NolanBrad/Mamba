@@ -1,0 +1,73 @@
+# This file configures the project for MambaTSF, and can also hold other
+# tools' configuration settings.
+#
+# More details about what can go in this file:
+# https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+
+[project]
+name = "MambaTSF"
+description = "An example package demonstrating how to make one"
+
+readme = "README.md"
+
+# Put your own name and email address here. You can also add more authors.
+authors = [
+    {name = "Brad Nolan", email = "brad@throttle.co.nz"},
+]
+
+# You can choose a different license: https://choosealicense.com/
+# If you do, update the License classifier below, and put the correct text into
+# your LICENSE.txt file.
+license.text = "Apache-2.0"
+
+# Classifiers for your package. PyPI displays these on its page.
+# See https://pypi.org/classifiers/ for all of the possibilities.
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+# This is the minimum version of Python that pip will install your package on.
+# An overview of Python versions, their features and their lifecycle time frames
+# is at https://nedbatchelder.com/text/which-py.html.
+requires-python = ">= 3.9"
+
+# List your needed third-party libraries,
+dependencies = [
+    "torch",
+    "lightning",
+    "transformers",
+    "datasets",
+    "einops"
+]
+
+# State that the version will be defined dynamically below.
+dynamic = ["version"]
+
+[project.urls]
+# These URLs are displayed in a sidebar on PyPI.
+"Source code" = "https://github.com/NolanBrad/MambaTSF"
+"Issue tracker" = "https://github.com/NolanBrad/MambaTSF/issues"
+
+[project.scripts]
+# COMMANDS: These are commands you are installing.  Omit this section if you
+# have no commands.  The names of the settings are the command names.
+# The values are a string in the form "module.to.import:function_to_run".
+
+# The 'pkgsample_add' command will run the function add_main() in the
+# src/pkgsample/add_cli.py file.
+#pkgsample_add = "pkgsample.add_cli:add_main"
+
+[tool.setuptools.dynamic]
+# The version number will be read from __version__ in src/pkgsample/__init__.py
+version.attr = "pkgsample.__version__"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"

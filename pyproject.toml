@@ -44,7 +44,9 @@ dependencies = [
     "lightning",
     "transformers",
     "datasets",
-    "einops"
+    "einops",
+    "pandas",
+    "matplotlib"
 ]
 
 # State that the version will be defined dynamically below.

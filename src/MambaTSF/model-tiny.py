@@ -22,18 +22,18 @@ Glossary:
 from __future__ import annotations
 
 import math
-import json
+from dataclasses import dataclass
+from typing import Union
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from dataclasses import dataclass
-from typing import Union
 from einops import rearrange, repeat
 
 
 
 @dataclass
-class ModelArgs:
+class MambaTinyConfig:
     d_model: int
     n_layer: int
     vocab_size: int
@@ -58,7 +58,7 @@ class ModelArgs:
 
 
 class Mamba(nn.Module):
-    def __init__(self, args: ModelArgs):
+    def __init__(self, args: MambaTinyConfig):
         """Full Mamba model."""
         super().__init__()
         self.args = args
@@ -91,59 +91,9 @@ class Mamba(nn.Module):
         x = self.norm_f(x)
         return self.lm_head(x)
 
-    @staticmethod
-    def from_pretrained(pretrained_model_name: str, model=None):
-        """Load pretrained weights from HuggingFace into model.
-
-        Args:
-            pretrained_model_name: One of
-                * 'state-spaces/mamba-2.8b-slimpj'
-                * 'state-spaces/mamba-2.8b'
-                * 'state-spaces/mamba-1.4b'
-                * 'state-spaces/mamba-790m'
-                * 'state-spaces/mamba-370m'
-                * 'state-spaces/mamba-130m'
-
-        Returns:
-            model: Mamba model with weights loaded
-
-        """
-        from transformers.utils import CONFIG_NAME, WEIGHTS_NAME
-        from transformers.utils.hub import cached_file
-
-        def load_config_hf(model_name):
-            resolved_archive_file = cached_file(model_name, CONFIG_NAME,
-                                                _raise_exceptions_for_missing_entries=False)
-            return json.load(open(resolved_archive_file))
-
-
-        def load_state_dict_hf(model_name, device=None, dtype=None):
-            resolved_archive_file = cached_file(model_name, WEIGHTS_NAME,
-                                                _raise_exceptions_for_missing_entries=False)
-            return torch.load(resolved_archive_file, weights_only=True, map_location='cpu', mmap=True)
-
-        if model is None:
-            config_data = load_config_hf(pretrained_model_name)
-            model = Mamba(ModelArgs(
-                d_model=config_data['d_model'],
-                n_layer=config_data['n_layer'],
-                vocab_size=config_data['vocab_size'],
-            ))
-
-        pretrained_dict = load_state_dict_hf(pretrained_model_name)
-        model_dict = model.state_dict()
-
-        for k, v in pretrained_dict.items():
-            k_new = k.replace('backbone.', '')
-            if k_new in model_dict and v.size() == model_dict[k_new].size():
-                model_dict[k_new] = pretrained_dict[k]
-
-        model.load_state_dict(model_dict)
-        return model
-
 
 class ResidualBlock(nn.Module):
-    def __init__(self, args: ModelArgs):
+    def __init__(self, args: MambaTinyConfig):
         """Simple block wrapping Mamba block with normalization and residual connection."""
         super().__init__()
         self.args = args
@@ -174,7 +124,7 @@ class ResidualBlock(nn.Module):
 
 
 class MambaBlock(nn.Module):
-    def __init__(self, args: ModelArgs):
+    def __init__(self, args: MambaTinyConfig):
         """A single Mamba block, as described in Figure 3 in Section 3.4 in the Mamba paper [1]."""
         super().__init__()
         self.args = args
@@ -291,7 +241,7 @@ class MambaBlock(nn.Module):
             Note: I refactored some parts out of `selective_scan_ref` out, so the functionality doesn't match exactly.
 
         """
-        
+
         dA = torch.einsum('bld,dn->bldn', dt, A)
         dB_u = torch.einsum('bld,bld,bln->bldn', dt, u, B)
 

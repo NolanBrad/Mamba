@@ -4,6 +4,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from typing import Optional
+
 
 @dataclass
 class S_D_MambaConfig:
@@ -12,9 +14,9 @@ class S_D_MambaConfig:
     use_norm: bool
     e_layers: int
     d_model: int
-    d_ff: int | None = None
+    d_ff: Optional[int] = None
     d_state: int = 16
-    dropout: int = 0.1
+    dropout: float = 0.1
     output_attention: bool = False
 
 
@@ -48,8 +50,8 @@ class Encoder(nn.Module):
         # x [B, L, D]
 
         if self.conv_layers is not None:
-            for i, (attn_layer, conv_layer) in enumerate(zip(self.attn_layers, self.conv_layers)):
-                x, attn = attn_layer(x)
+            for _, (attn_layer, conv_layer) in enumerate(zip(self.attn_layers, self.conv_layers)):
+                x, _ = attn_layer(x)
                 x = conv_layer(x)
 
             x, _ = self.attn_layers[-1](x)
@@ -93,7 +95,7 @@ class SDMamba(nn.Module):
 
     def __init__(self, configs: S_D_MambaConfig, mamba_forward, mamba_reverse):
 
-        super(SDModel, self).__init__()
+        super(SDMamba, self).__init__()
 
         self.seq_len = configs.seq_len
         self.pred_len = configs.pred_len
@@ -134,7 +136,7 @@ class SDMamba(nn.Module):
 
         # B N E -> B N E                (B L E -> B L E in the vanilla Transformer)
         # the dimensions of embedded time series has been inverted, and then processed by native attn, layernorm and ffn modules
-        enc_out, attns = self.encoder(enc_out, attn_mask=None)
+        enc_out, _ = self.encoder(enc_out, attn_mask=None)
         # B N E -> B N S -> B S N
         dec_out = self.projector(enc_out).permute(0, 2, 1)[:, :, :N] # filter the covariates
 
@@ -146,6 +148,6 @@ class SDMamba(nn.Module):
         return dec_out
 
 
-    def forward(self, x_enc, x_dec ):
-        dec_out = self.forecast(x_enc, x_dec)
+    def forward(self, x_enc):
+        dec_out = self.forecast(x_enc)
         return dec_out[:, -self.pred_len:, :]  # [B, L, D]

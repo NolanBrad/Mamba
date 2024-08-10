@@ -6,7 +6,7 @@
 
 [project]
 name = "MambaTSF"
-description = "An example package demonstrating how to make one"
+description = "My collection of Mamba resources for Time Series Forecasting"
 
 readme = "README.md"
 
@@ -62,11 +62,11 @@ dynamic = ["version"]
 
 # The 'pkgsample_add' command will run the function add_main() in the
 # src/pkgsample/add_cli.py file.
-#pkgsample_add = "pkgsample.add_cli:add_main"
+# pkgsample_add = "pkgsample.add_cli:add_main"
 
 [tool.setuptools.dynamic]
-# The version number will be read from __version__ in src/pkgsample/__init__.py
-version.attr = "pkgsample.__version__"
+# The version number will be read from __version__ in src/MambaTSF/__init__.py
+version.attr = "MambaTSF.__version__"
 
 [build-system]
 requires = ["setuptools"]

@@ -3,7 +3,7 @@
 # This is the version number of your code.  This will change each time you make
 # a new release.  The most popular approach is to use Semantic Versioning,
 # described at https://semver.org/
-__version__ = "0.1.4"
+__version__ = "0.1.5"
 
 
 # Version History
@@ -11,8 +11,9 @@ __version__ = "0.1.4"
 # 0.1.2 Add iTransformer and utils
 # 0.1.3 Module name changes and correct imports
 # 0.1.4 Corrected imports
+# 0.1.5 Export utils
 
-import MambaTSF.utils
+import MambaTSF.utils as utils
 
 from MambaTSF.mamba_tiny import MambaTinyConfig
 from MambaTSF.mamba_tiny import MambaBlock as MambaBlockTiny

@@ -3,13 +3,14 @@
 # This is the version number of your code.  This will change each time you make
 # a new release.  The most popular approach is to use Semantic Versioning,
 # described at https://semver.org/
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 
 
 # Version History
 # 0.1.1 Intial relase with tiny and min mamba models
 # 0.1.2 Add iTransformer and utils
 # 0.1.3 Module name changes and correct imports
+# 0.1.4 Corrected imports
 
 import MambaTSF.utils
 

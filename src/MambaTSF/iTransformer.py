@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 
-from utils.masking import TriangularCausalMask
+from MambaTSF.utils.masking import TriangularCausalMask
 
 class DataEmbedding_inverted(nn.Module):
     def __init__(self, c_in, d_model, embed_type='fixed', freq='h', dropout=0.1):
@@ -139,13 +139,15 @@ class AttentionLayer(nn.Module):
 
         return self.out_projection(out), attn
 
-class Model(nn.Module):
+class iTransModel(nn.Module):
     """
     Paper link: https://arxiv.org/abs/2310.06625
     """
 
     def __init__(self, configs):
-        super(Model, self).__init__()
+
+        super(iTransModel, self).__init__()
+
         self.seq_len = configs.seq_len
         self.pred_len = configs.pred_len
         self.output_attention = configs.output_attention
@@ -206,4 +208,3 @@ class Model(nn.Module):
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
         dec_out = self.forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)
         return dec_out[:, -self.pred_len:, :]  # [B, L, D]
-

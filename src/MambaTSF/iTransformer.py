@@ -1,10 +1,65 @@
 import math
 import torch
+
+from dataclasses import dataclass
+
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 
 from MambaTSF.utils.masking import TriangularCausalMask
+
+from typing import Optional
+
+@dataclass
+class iTransConfig:
+
+    d_model: int
+    n_layer: int
+    vocab_size: int
+    d_state: int = 16
+    expand: int = 2
+    d_conv: int = 4
+    pad_vocab_size_multiple: int = 8
+    conv_bias: bool = True
+    bias: bool = False
+    num_workers: Optional[int] = None
+    batch_size: int = 16
+    seq_len: int = 64
+    label_len: int = 0
+    pred_len: int = 1
+    use_gpu: bool = False
+    output_attention: bool = False
+    use_norm: bool = True
+    embed: str ='fixed'
+    freq: str = 'h'
+    dropout: float = 0.1
+    class_strategy: str = 'projection'
+    e_layers: int = 16
+    d_ff: Optional[int] = None
+    activation: str = "relu"
+    checkpoints: str ='checkpoints'
+    patience: int = 10
+    learning_rate: float = 0.001
+    use_amp: bool = False
+    train_epochs: int = 50
+
+    # iTransformer
+    factor: int = 5
+    n_heads: int = 8
+    features: str = 'MS'
+    lradj: str = 'type1'
+
+    inverse: bool = True
+    adjust_learning: bool = False
+
+    def __post_init__(self):
+        self.d_inner = int(self.expand * self.d_model)
+        self.dt_rank = math.ceil(self.d_model / 16)
+
+        if self.vocab_size % self.pad_vocab_size_multiple != 0:
+            self.vocab_size += (self.pad_vocab_size_multiple
+                                - self.vocab_size % self.pad_vocab_size_multiple)
 
 class DataEmbedding_inverted(nn.Module):
     def __init__(self, c_in, d_model, embed_type='fixed', freq='h', dropout=0.1):
@@ -144,7 +199,7 @@ class iTransModel(nn.Module):
     Paper link: https://arxiv.org/abs/2310.06625
     """
 
-    def __init__(self, configs):
+    def __init__(self, configs:iTransConfig ):
 
         super(iTransModel, self).__init__()
 

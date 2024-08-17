@@ -3,7 +3,7 @@
 # This is the version number of your code.  This will change each time you make
 # a new release.  The most popular approach is to use Semantic Versioning,
 # described at https://semver.org/
-__version__ = "0.1.10"
+__version__ = "0.1.11"
 
 
 # Version History
@@ -17,6 +17,7 @@ __version__ = "0.1.10"
 # 0.1.8 DataEmbedding_inverted forward not handling x_mark correctly
 # 0.1.9 Add iTransConfig
 # 0.1.10 Correct SDMamba caling Encoder forward
+# 0.1.11 Correct model objects used in SDMamba Layers
 
 import MambaTSF.utils
 

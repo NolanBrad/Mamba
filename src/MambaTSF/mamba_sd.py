@@ -92,7 +92,7 @@ class SDMamba(nn.Module):
     Paper link: https://arxiv.org/abs/2310.06625
     """
 
-    def __init__(self, configs: S_D_MambaConfig, mamba_forward, mamba_reverse):
+    def __init__(self, configs: S_D_MambaConfig, mambaModel, mambaConfig):
 
         super(SDMamba, self).__init__()
 
@@ -106,7 +106,7 @@ class SDMamba(nn.Module):
         # Encoder-only architecture
         self.encoder = Encoder(
             [
-                EncoderLayer(mamba_forward, mamba_reverse,
+                EncoderLayer(mambaModel(mambaConfig), mambaModel(mambaConfig),
                     configs.d_model,
                     configs.d_ff,
                     dropout=configs.dropout )

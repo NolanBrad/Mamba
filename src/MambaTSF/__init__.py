@@ -18,6 +18,7 @@ __version__ = "0.1.11"
 # 0.1.9 Add iTransConfig
 # 0.1.10 Correct SDMamba caling Encoder forward
 # 0.1.11 Correct model objects used in SDMamba Layers
+# 0.1.12 Remove matplotlib and functions visuals
 
 import MambaTSF.utils
 

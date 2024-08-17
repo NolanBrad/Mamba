@@ -135,7 +135,7 @@ class SDMamba(nn.Module):
 
         # B N E -> B N E                (B L E -> B L E in the vanilla Transformer)
         # the dimensions of embedded time series has been inverted, and then processed by native attn, layernorm and ffn modules
-        enc_out, _ = self.encoder(enc_out, attn_mask=None)
+        enc_out, _ = self.encoder(enc_out)
         # B N E -> B N S -> B S N
         dec_out = self.projector(enc_out).permute(0, 2, 1)[:, :, :N] # filter the covariates
 

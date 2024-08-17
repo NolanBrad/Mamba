@@ -3,7 +3,7 @@
 # This is the version number of your code.  This will change each time you make
 # a new release.  The most popular approach is to use Semantic Versioning,
 # described at https://semver.org/
-__version__ = "0.1.7"
+__version__ = "0.1.8"
 
 
 # Version History
@@ -14,6 +14,7 @@ __version__ = "0.1.7"
 # 0.1.5 Export utils
 # 0.1.6 Correct iTransformer import of utils
 # 0.1.7 Corrected tools adjust_learning_rate
+# 0.1.8 DataEmbedding_inverted forward not handling x_mark correctly
 
 import MambaTSF.utils
 
@@ -28,7 +29,7 @@ from MambaTSF.mamba_min import Mamba as MambaMin
 from MambaTSF.mamba_sd import S_D_MambaConfig
 from MambaTSF.mamba_sd import SDMamba
 
-from MambaTSF.iTransformer import iTransModel
+from MambaTSF.iTransformer import iTransModel, iTransConfig
 
 
 #__all__ = [ "utils", "iTransformer", "mamba_min", "mamba_tiny", "mamba_sd" ]

@@ -14,6 +14,7 @@ class S_D_MambaConfig:
     use_norm: bool
     e_layers: int
     d_model: int
+    out_len: int = 1
     d_ff: Optional[int] = None
     d_state: int = 16
     dropout: float = 0.1
@@ -143,6 +144,12 @@ class SDMamba(nn.Module):
             # De-Normalization from Non-stationary Transformer
             dec_out = dec_out * (stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
             dec_out = dec_out + (means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
+
+        # Y is the out_len, i.e the number of output sequences
+        # B S N -> B S Y
+        Y = self.configs.out_len
+        if Y <= N:
+            dec_out = dec_out[:, :, :Y]
 
         return dec_out
 

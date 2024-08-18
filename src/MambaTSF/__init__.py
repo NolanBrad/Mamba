@@ -3,7 +3,7 @@
 # This is the version number of your code.  This will change each time you make
 # a new release.  The most popular approach is to use Semantic Versioning,
 # described at https://semver.org/
-__version__ = "0.1.13"
+__version__ = "0.1.14"
 
 
 # Version History
@@ -20,6 +20,7 @@ __version__ = "0.1.13"
 # 0.1.11 Correct model objects used in SDMamba Layers
 # 0.1.12 Remove matplotlib and functions visuals
 # 0.1.13 Add out_len to SDMamaba
+# 0.1.14 Correct implementation of out_len to out_var in SDMamaba
 
 import MambaTSF.utils
 

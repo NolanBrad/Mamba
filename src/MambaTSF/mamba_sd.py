@@ -14,7 +14,7 @@ class S_D_MambaConfig:
     use_norm: bool
     e_layers: int
     d_model: int
-    out_len: int = 1
+    out_vars: int = 1
     d_ff: Optional[int] = None
     d_state: int = 16
     dropout: float = 0.1
@@ -101,6 +101,7 @@ class SDMamba(nn.Module):
         self.pred_len = configs.pred_len
         self.output_attention = configs.output_attention
         self.use_norm = configs.use_norm
+        self.out_vars = configs.out_vars
         # Embedding
         self.enc_embedding = DataEmbedding_inverted(configs.seq_len, configs.d_model, configs.dropout)
 
@@ -147,9 +148,10 @@ class SDMamba(nn.Module):
 
         # Y is the out_len, i.e the number of output sequences
         # B S N -> B S Y
-        Y = self.configs.out_len
-        if Y <= N:
-            dec_out = dec_out[:, :, :Y]
+        Y = self.out_vars
+        if Y is not None:
+            if Y <= N:
+                dec_out = dec_out[:, :, :Y]
 
         return dec_out
 

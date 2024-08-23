@@ -103,6 +103,8 @@ class SDMamba(nn.Module):
         self.output_attention = configs.output_attention
         self.use_norm = configs.use_norm
         self.out_vars = configs.out_vars
+        self.variates = configs.variates
+
         # Embedding
         self.enc_embedding = DataEmbedding_inverted(configs.seq_len, configs.d_model, configs.dropout)
 
@@ -132,7 +134,7 @@ class SDMamba(nn.Module):
         # B: batch_size;    E: d_model;
         # L: seq_len;       S: pred_len;
         # N: number of variate (tokens), can also includes covariates
-        assert(N == configs.variates)
+        assert(N == self.variates)
 
         # Embedding
         # B L N -> B N E                (B L N -> B L E in the vanilla Transformer)
@@ -145,7 +147,7 @@ class SDMamba(nn.Module):
         dec_out = self.projector(enc_out).permute(0, 2, 1)[:, :, :N] # filter the covariates
 
         # Y is the out_vars, i.e the number of output sequences
-        # B S N -> B S Y        
+        # B S N -> B S Y
         dec_out = self.output(dec_out)
 
         if self.use_norm:

@@ -14,7 +14,8 @@ class S_D_MambaConfig:
     use_norm: bool
     e_layers: int
     d_model: int
-    out_vars: int = 1
+    variates: int
+    out_vars: int
     d_ff: Optional[int] = None
     d_state: int = 16
     dropout: float = 0.1
@@ -117,6 +118,7 @@ class SDMamba(nn.Module):
             norm_layer=torch.nn.LayerNorm(configs.d_model)
         )
         self.projector = nn.Linear(configs.d_model, configs.pred_len, bias=True)
+        self.output = nn.Linear(configs.variates, configs.out_vars, bias=True)
 
     def forecast(self, x_enc):
         if self.use_norm:
@@ -130,6 +132,7 @@ class SDMamba(nn.Module):
         # B: batch_size;    E: d_model;
         # L: seq_len;       S: pred_len;
         # N: number of variate (tokens), can also includes covariates
+        assert(N == configs.variates)
 
         # Embedding
         # B L N -> B N E                (B L N -> B L E in the vanilla Transformer)
@@ -141,17 +144,14 @@ class SDMamba(nn.Module):
         # B N E -> B N S -> B S N
         dec_out = self.projector(enc_out).permute(0, 2, 1)[:, :, :N] # filter the covariates
 
+        # Y is the out_vars, i.e the number of output sequences
+        # B S N -> B S Y        
+        dec_out = self.output(dec_out)
+
         if self.use_norm:
             # De-Normalization from Non-stationary Transformer
             dec_out = dec_out * (stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
             dec_out = dec_out + (means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
-
-        # Y is the out_len, i.e the number of output sequences
-        # B S N -> B S Y
-        Y = self.out_vars
-        if Y is not None:
-            if Y <= N:
-                dec_out = dec_out[:, :, :Y]
 
         return dec_out
 

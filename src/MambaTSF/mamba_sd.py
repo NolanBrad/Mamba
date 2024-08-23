@@ -146,14 +146,14 @@ class SDMamba(nn.Module):
         # B N E -> B N S -> B S N
         dec_out = self.projector(enc_out).permute(0, 2, 1)[:, :, :N] # filter the covariates
 
-        # Y is the out_vars, i.e the number of output sequences
-        # B S N -> B S Y
-        dec_out = self.output(dec_out)
-
         if self.use_norm:
             # De-Normalization from Non-stationary Transformer
             dec_out = dec_out * (stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
             dec_out = dec_out + (means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
+
+        # Y is the out_vars, i.e the number of output sequences
+        # B S N -> B S Y
+        dec_out = self.output(dec_out)
 
         return dec_out
 

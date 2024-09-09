@@ -14,15 +14,23 @@ class ShiftConfig:
 
 class Shift(nn.Module):
     """
-    Use a Linear layer with a sigmoid activation to
+    Use Linear\Relu layers with a final sigmoid activation to
     determine how much to 'shift' or 'roll' the time sequence
     """
 
     def __init__(self, configs:ShiftConfig):
-
         super(Shift, self).__init__()
         self.configs = configs
-        self.shiftLinear = nn.Linear(configs.seqLen, 1, bias=True)
+        self.shiftPred = nn.Sequential(
+            nn.Linear(configs.seqLen, configs.seqLen // 2, bias=True),
+            nn.ReLu(),
+            nn.Linear(configs.seqLen // 2, configs.seqLen // 4, bias=True),
+            nn.ReLu(),
+            nn.Linear(configs.seqLen // 4, configs.seqLen // 8, bias=True),
+            nn.ReLu(),
+            nn.Linear(configs.seqLen // 8, 1, bias=True),
+            F.sigmoid()
+        )
 
     def forward(self, x):
 
@@ -37,9 +45,10 @@ class Shift(nn.Module):
         x_shift = x.permute(0, 2, 1)
 
         # B L N -> B N 1
-        x_shift = self.shiftLinear(x_shift)
-        y_shift = F.sigmoid(x_shift) * self.configs.seqLen
+        x_shift = self.shiftPred(x_shift)
+        y_shift = x_shift * self.configs.seqLen
+        y_shift = torch.round(y_shift).long()
 
-        y = torch.roll(x, y_shift, dims=2)
+        y = torch.roll(x, y_shift, dims=1)
 
         return y  # [B, L(shifted by y_shift), N]

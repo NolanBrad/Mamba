@@ -1,9 +1,12 @@
 # The code is based on:
 # https://github.com/davidmrau/mixture-of-experts/blob/master/moe.py
 
+from typing import List, Int
+
 import torch
 import torch.nn as nn
 from torch.distributions.normal import Normal
+
 
 class SparseDispatcher(object):
     """Helper for implementing a mixture of experts.
@@ -114,13 +117,16 @@ class SparseRMoK(nn.Module):
     k: an integer - how many experts to use for each batch element
     """
 
-    def __init__(self, hist_len, pred_len, var_num, experts_list, noisy_gating=True, k=4, drop=0.1, revin):
+    def __init__(self, hist_len:Int, pred_len:Int, var_num:Int, experts_list:List, revin=None, noisy_gating=True, k=4, drop=0.1, loss_coef=1e-2):
         super(SparseRMoK, self).__init__()
         self.noisy_gating = noisy_gating
-        self.num_experts = num_experts
+        self.num_experts = len(experts_list)
         self.output_size = pred_len
         self.input_size = hist_len
         self.k = k
+        self.loss_coef = loss_coef
+
+        _ = var_num
 
         self.experts = nn.ModuleList(experts_list)
         self.w_gate = nn.Parameter(torch.zeros(hist_len, len(experts_list)), requires_grad=True)
@@ -130,7 +136,7 @@ class SparseRMoK(nn.Module):
         self.softmax = nn.Softmax(1)
         self.register_buffer("mean", torch.tensor([0.0]))
         self.register_buffer("std", torch.tensor([1.0]))
-        assert (self.k <= self.num_experts)
+        assert self.k <= self.num_experts
 
         self.dropout = nn.Dropout(drop)
         self.rev = revin
@@ -209,7 +215,7 @@ class SparseRMoK(nn.Module):
         clean_logits = x @ self.w_gate
         if self.noisy_gating and train:
             raw_noise_stddev = x @ self.w_noise
-            noise_stddev = ((self.softplus(raw_noise_stddev) + noise_epsilon))
+            noise_stddev = self.softplus(raw_noise_stddev) + noise_epsilon
             noisy_logits = clean_logits + (torch.randn_like(clean_logits) * noise_stddev)
             logits = noisy_logits
         else:
@@ -231,7 +237,7 @@ class SparseRMoK(nn.Module):
             load = self._gates_to_load(gates)
         return gates, load
 
-    def forward(self, var_x, marker_x, loss_coef=1e-2):
+    def forward(self, var_x):
         """Args:
         x: tensor shape [batch_size, input_size]
         train: a boolean scalar.
@@ -243,7 +249,8 @@ class SparseRMoK(nn.Module):
         training loss of the model.  The backpropagation of this loss
         encourages all experts to be approximately equally used across a batch.
         """
-        var_x = self.dropout(self.rev(var_x[..., 0], 'norm'))  # x: [B, L, N]
+        if self.rev is not None:
+            var_x = self.dropout(self.rev(var_x[..., 0], 'norm'))  # x: [B, L, N]
         B, L, N = var_x.shape
         x = var_x.permute(0, 1, 2).reshape(B * N, L)
 
@@ -252,7 +259,7 @@ class SparseRMoK(nn.Module):
         importance = gates.sum(0)
         #
         loss = self.cv_squared(importance) + self.cv_squared(load)
-        loss *= loss_coef
+        loss *= self.loss_coef
 
         dispatcher = SparseDispatcher(self.num_experts, gates)
         expert_inputs = dispatcher.dispatch(x)
@@ -261,5 +268,6 @@ class SparseRMoK(nn.Module):
         prediction = dispatcher.combine(expert_outputs)
 
         prediction = prediction.reshape(B, N, -1).permute(0, 2, 1)
-        prediction = self.rev(prediction, 'denorm')
+        if self.rev is not None:
+            prediction = self.rev(prediction, 'denorm')
         return prediction, loss

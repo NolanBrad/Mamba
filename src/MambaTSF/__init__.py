@@ -3,7 +3,7 @@
 # This is the version number of your code.  This will change each time you make
 # a new release.  The most popular approach is to use Semantic Versioning,
 # described at https://semver.org/
-__version__ = "0.1.16"
+__version__ = "0.1.17"
 
 
 # Version History
@@ -23,6 +23,7 @@ __version__ = "0.1.16"
 # 0.1.14 Correct implementation of out_len to out_var in SDMamaba
 # 0.1.15 Add linear layer for output variates
 # 0.1.16 Relocate linear layer for output variates to after norm
+# 0.1.17 Add RevIn, Shift and sparsermok
 
 import MambaTSF.utils
 
@@ -39,5 +40,8 @@ from MambaTSF.mamba_sd import SDMamba
 
 from MambaTSF.iTransformer import iTransModel, iTransConfig
 
+from MambaTSF.RevIN import RevIN
+from MambaTSF.Shift import Shift
+from MambaTSF.sparsermok import SparseRMoK
 
-#__all__ = [ "utils", "iTransformer", "mamba_min", "mamba_tiny", "mamba_sd" ]
+__all__ = [ "utils", "iTransformer", "mamba_min", "mamba_tiny", "mamba_sd", "RevIN", "Shift", "sparsermok" ]

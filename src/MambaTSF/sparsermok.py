@@ -117,7 +117,7 @@ class SparseRMoK(nn.Module):
     k: an integer - how many experts to use for each batch element
     """
 
-    def __init__(self, hist_len:Int, pred_len:Int, var_num:Int, experts_list:List, revin=None, noisy_gating=True, k=4, drop=0.1, loss_coef=1e-2):
+    def __init__(self, hist_len:int, pred_len:int, var_num:int, experts_list:List, revin=None, noisy_gating=True, k=4, drop=0.1, loss_coef=1e-2):
         super(SparseRMoK, self).__init__()
         self.noisy_gating = noisy_gating
         self.num_experts = len(experts_list)

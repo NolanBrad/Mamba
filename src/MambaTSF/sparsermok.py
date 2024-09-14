@@ -1,7 +1,7 @@
 # The code is based on:
 # https://github.com/davidmrau/mixture-of-experts/blob/master/moe.py
 
-from typing import List, Int
+from typing import List
 
 import torch
 import torch.nn as nn

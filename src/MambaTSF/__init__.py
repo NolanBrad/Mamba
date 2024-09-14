@@ -3,7 +3,7 @@
 # This is the version number of your code.  This will change each time you make
 # a new release.  The most popular approach is to use Semantic Versioning,
 # described at https://semver.org/
-__version__ = "0.1.17"
+__version__ = "0.1.18"
 
 
 # Version History
@@ -24,6 +24,7 @@ __version__ = "0.1.17"
 # 0.1.15 Add linear layer for output variates
 # 0.1.16 Relocate linear layer for output variates to after norm
 # 0.1.17 Add RevIn, Shift and sparsermok
+# 0.1.18 Correct sparsermok importing Int
 
 import MambaTSF.utils
 

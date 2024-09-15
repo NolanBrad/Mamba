@@ -19,7 +19,6 @@ class S_D_MambaConfig:
     d_ff: Optional[int] = None
     d_state: int = 16
     dropout: float = 0.1
-    output_attention: bool = False
 
 
 class DataEmbedding_inverted(nn.Module):
@@ -100,7 +99,6 @@ class SDMamba(nn.Module):
 
         self.seq_len = configs.seq_len
         self.pred_len = configs.pred_len
-        self.output_attention = configs.output_attention
         self.use_norm = configs.use_norm
         self.out_vars = configs.out_vars
         self.variates = configs.variates
@@ -160,4 +158,4 @@ class SDMamba(nn.Module):
 
     def forward(self, x_enc):
         dec_out = self.forecast(x_enc)
-        return dec_out[:, -self.pred_len:, :]  # [B, L, D]
+        return dec_out[:, -self.pred_len:, :] , 0 # [B, L, D], loss

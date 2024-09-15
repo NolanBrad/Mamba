@@ -250,7 +250,7 @@ class SparseRMoK(nn.Module):
         encourages all experts to be approximately equally used across a batch.
         """
         if self.rev is not None:
-            var_x = self.dropout(self.rev(var_x[..., 0], 'norm'))  # x: [B, L, N]
+            var_x = self.dropout(self.rev(var_x, 'norm'))  # x: [B, L, N]
         B, L, N = var_x.shape
         x = var_x.permute(0, 1, 2).reshape(B * N, L)
 

@@ -3,7 +3,7 @@
 # This is the version number of your code.  This will change each time you make
 # a new release.  The most popular approach is to use Semantic Versioning,
 # described at https://semver.org/
-__version__ = "0.1.20"
+__version__ = "0.1.21"
 
 
 # Version History
@@ -27,6 +27,7 @@ __version__ = "0.1.20"
 # 0.1.18 Correct sparsermok importing Int
 # 0.1.19 Correct sparsermok using Int, FFS
 # 0.1.20 Remove attn output, replace with loss. Correct SparseRMoK forward x shape
+# 0.1.21 Change (temporarily) SparseRMoK to send B,L,N shape tensors to the experts. 
 
 import MambaTSF.utils
 

@@ -239,12 +239,12 @@ class SparseRMoK(nn.Module):
 
     def forward(self, var_x):
         """Args:
-        x: tensor shape [batch_size, input_size]
+        x: tensor shape [batch_size, sequence_len, input_vars]
         train: a boolean scalar.
         loss_coef: a scalar - multiplier on load-balancing losses
 
         Returns:
-        y: a tensor with shape [batch_size, output_size].
+        y: a tensor with shape [batch_size, sequence_len, input_vars].
         extra_training_loss: a scalar.  This should be added into the overall
         training loss of the model.  The backpropagation of this loss
         encourages all experts to be approximately equally used across a batch.
@@ -263,8 +263,13 @@ class SparseRMoK(nn.Module):
 
         dispatcher = SparseDispatcher(self.num_experts, gates)
         expert_inputs = dispatcher.dispatch(x)
+
         gates = dispatcher.expert_to_gates()
+
+        expert_inputs = [expert_inputs[i].reshape(B, N, -1).permute(0, 2, 1) for i in range(self.num_experts)]
         expert_outputs = [self.experts[i](expert_inputs[i]) for i in range(self.num_experts)]
+
+        expert_outputs = [expert_outputs[i].permute(0, 1, 2).reshape(B * N, L) for i in range(self.num_experts)]
         prediction = dispatcher.combine(expert_outputs)
 
         prediction = prediction.reshape(B, N, -1).permute(0, 2, 1)

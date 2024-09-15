@@ -252,7 +252,7 @@ class SparseRMoK(nn.Module):
         if self.rev is not None:
             var_x = self.dropout(self.rev(var_x, 'norm'))  # x: [B, L, N]
         B, L, N = var_x.shape
-        x = var_x.permute(0, 1, 2).reshape(B * N, L)
+        x = var_x.permute(0, 2, 1).reshape(B * N, L)
 
         gates, load = self.noisy_top_k_gating(x, self.training)
         # calculate importance loss
@@ -269,7 +269,7 @@ class SparseRMoK(nn.Module):
         expert_inputs = [expert_inputs[i].reshape(B, N, -1).permute(0, 2, 1) for i in range(self.num_experts)]
         expert_outputs = [self.experts[i](expert_inputs[i]) for i in range(self.num_experts)]
 
-        expert_outputs = [expert_outputs[i].permute(0, 1, 2).reshape(B * N, L) for i in range(self.num_experts)]
+        expert_outputs = [expert_outputs[i].permute(0, 2, 1).reshape(B * N, L) for i in range(self.num_experts)]
         prediction = dispatcher.combine(expert_outputs)
 
         prediction = prediction.reshape(B, N, -1).permute(0, 2, 1)

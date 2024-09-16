@@ -110,27 +110,23 @@ class SparseRMoK(nn.Module):
     """Call a Sparsely gated mixture of experts layer with 1-layer Feed-Forward networks as experts.
     Args:
     input_size: integer - size of the input
-    output_size: integer - size of the input
     num_experts: an integer - number of experts
     hidden_size: an integer - hidden size of the experts
     noisy_gating: a boolean
     k: an integer - how many experts to use for each batch element
     """
 
-    def __init__(self, hist_len:int, pred_len:int, var_num:int, experts_list:List, revin=None, noisy_gating=True, k=4, drop=0.1, loss_coef=1e-2):
+    def __init__(self, seq_len:int, var_num:int, experts_list:List, revin=None, noisy_gating=True, k=4, drop=0.1, loss_coef=1e-2):
         super(SparseRMoK, self).__init__()
         self.noisy_gating = noisy_gating
         self.num_experts = len(experts_list)
-        self.output_size = pred_len
-        self.input_size = hist_len
+        self.input_size = seq_len * var_num # L * N
         self.k = k
         self.loss_coef = loss_coef
 
-        _ = var_num
-
         self.experts = nn.ModuleList(experts_list)
-        self.w_gate = nn.Parameter(torch.zeros(hist_len, len(experts_list)), requires_grad=True)
-        self.w_noise = nn.Parameter(torch.zeros(hist_len, len(experts_list)), requires_grad=True)
+        self.w_gate = nn.Parameter(torch.zeros(self.input_size , len(experts_list)), requires_grad=True)
+        self.w_noise = nn.Parameter(torch.zeros(self.input_size , len(experts_list)), requires_grad=True)
 
         self.softplus = nn.Softplus()
         self.softmax = nn.Softmax(1)

@@ -3,7 +3,7 @@
 # This is the version number of your code.  This will change each time you make
 # a new release.  The most popular approach is to use Semantic Versioning,
 # described at https://semver.org/
-__version__ = "0.1.24"
+__version__ = "0.1.25"
 
 
 # Version History
@@ -31,6 +31,7 @@ __version__ = "0.1.24"
 # 0.1.22 Correct SparseRMoK permute for BN,L <--> B,L,N conversion
 # 0.1.23 And again ... Correct SparseRMoK reshape for B,L,N <--> B,(L*N) conversion with -1 for B wildcard
 # 0.1.24 Correct input_size computed value, and fix init args for SparseRMoK
+# 0.1.25 Add inputs and outpus tuples to SparseRMok
 
 import MambaTSF.utils
 

@@ -271,13 +271,23 @@ class SparseRMoK(nn.Module):
         gates = dispatcher.expert_to_gates()
 
         # Get the inputs for each experts
-        expert_inputs = [expert_inputs[i].reshape(-1, L, N) for i in range(self.num_experts)]
+        #expert_inputs = [expert_inputs[i].reshape(-1, L, N) for i in range(self.num_experts)]
 
         # Execute the experts
-        expert_outputs = [self.experts[i](expert_inputs[i]) for i in range(self.num_experts)]
+        #expert_outputs = [self.experts[i](expert_inputs[i]) for i in range(self.num_experts)]
 
         # Prepare the output of each expert
-        expert_outputs = [expert_outputs[i].reshape(-1, S*Y) for i in range(self.num_experts)]
+        #expert_outputs = [expert_outputs[i].reshape(-1, S*Y) for i in range(self.num_experts)]
+
+        expert_outputs = []
+        for i in range(self.num_experts):
+            expert_input = expert_inputs[i].reshape(-1, L, N)
+            if expert_input.shape[0] > 0:
+                expert_output = self.experts[i](expert_input)
+                expert_outputs.append(expert_output.reshape(-1, S*Y))
+            else:
+                expert_outputs.append(torch.zeros(1, S*Y))
+
         prediction = dispatcher.combine(expert_outputs)
 
         prediction = prediction.reshape(B, S, Y)

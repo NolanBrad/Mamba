@@ -285,8 +285,6 @@ class SparseRMoK(nn.Module):
             if expert_input.shape[0] > 0:
                 expert_output = self.experts[i](expert_input)
                 expert_outputs.append(expert_output.reshape(-1, S*Y))
-            else:
-                expert_outputs.append(torch.zeros(1, S*Y))
 
         prediction = dispatcher.combine(expert_outputs)
 

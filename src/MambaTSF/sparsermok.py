@@ -140,6 +140,11 @@ class SparseRMoK(nn.Module):
         self.dropout = nn.Dropout(drop)
         self.rev = revin
 
+        self.gates_log = []
+        for _ in range(self.num_experts):
+            self.gates_log.append(torch.Tensor())
+
+
     def cv_squared(self, x):
         """The squared coefficient of variation of a sample.
         Useful as a loss to encourage a positive distribution to be more uniform.
@@ -269,6 +274,9 @@ class SparseRMoK(nn.Module):
         expert_inputs = dispatcher.dispatch(x)
 
         gates = dispatcher.expert_to_gates()
+        for e, gate in enumerate(gates):
+            gate = torch.masked_select(gate, gate.gt(0)).flatten()
+            self.gates_log[e] = torch.cat([self.gates_log[e], gate])
 
         # Get the inputs for each experts
         #expert_inputs = [expert_inputs[i].reshape(-1, L, N) for i in range(self.num_experts)]
@@ -292,3 +300,4 @@ class SparseRMoK(nn.Module):
         if self.rev is not None:
             prediction = self.rev(prediction, 'denorm')
         return prediction, loss
+

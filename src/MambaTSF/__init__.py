@@ -3,7 +3,7 @@
 # This is the version number of your code.  This will change each time you make
 # a new release.  The most popular approach is to use Semantic Versioning,
 # described at https://semver.org/
-__version__ = "0.1.28"
+__version__ = "0.1.29"
 
 
 # Version History
@@ -35,6 +35,7 @@ __version__ = "0.1.28"
 # 0.1.26 Only call an expert if the batch size is > 0
 # 0.1.27 Dont need to cater for any dropped expert output is batch is 0
 # 0.1.28 Add Expert gates logging to SparseRMok
+# 0.1.29 Add reset_gates_log() to SparseRMok
 
 import MambaTSF.utils
 

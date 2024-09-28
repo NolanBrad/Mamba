@@ -140,10 +140,12 @@ class SparseRMoK(nn.Module):
         self.dropout = nn.Dropout(drop)
         self.rev = revin
 
+        self.reset_gates_log()
+
+    def reset_gates_log(self):
         self.gates_log = []
         for _ in range(self.num_experts):
             self.gates_log.append(torch.Tensor())
-
 
     def cv_squared(self, x):
         """The squared coefficient of variation of a sample.
